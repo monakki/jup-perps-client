@@ -1,0 +1,45 @@
+{
+	"name": "jup-perps-client",
+	"version": "1.1.0",
+	"description": "TypeScript client for Jupiter Perpetuals",
+	"main": "dist/index.js",
+	"types": "dist/index.d.ts",
+	"type": "module",
+	"scripts": {
+		"test": "echo \"Error: no test specified\" && exit 1"
+	},
+	"keywords": [
+		"solana",
+		"jupiter",
+		"perpetuals",
+		"typescript",
+		"defi",
+		"trading"
+	],
+	"author": "monakki",
+	"license": "MIT",
+	"homepage": "https://github.com/monakki/jup-perps-client#readme",
+	"repository": {
+		"type": "git",
+		"url": "https://github.com/monakki/jup-perps-client.git"
+	},
+	"bugs": {
+		"url": "https://github.com/monakki/jup-perps-client/issues"
+	},
+	"engines": {
+		"node": ">=24.0.0",
+		"npm": ">=10.0.0"
+	},
+	"funding": {
+		"type": "custom",
+		"url": "https://github.com/monakki/jup-perps-client#-support"
+	},
+	"peerDependencies": {
+		"@solana/kit": "^2.3.0"
+	},
+	"peerDependenciesMeta": {
+		"@solana/kit": {
+			"optional": false
+		}
+	}
+}

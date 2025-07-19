@@ -1,0 +1,6 @@
+# Development files
+src/
+tsconfig.json
+example.ts
+
+# Only publish dist/ and package files

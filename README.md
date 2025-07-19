@@ -1,284 +1,149 @@
-# Jupiter Perpetuals Client
+# Jupiter Perpetuals Client Generator
 
-[![NPM Version](https://img.shields.io/npm/v/jup-perps-client.svg)](https://www.npmjs.com/package/jup-perps-client)
-[![NPM Downloads](https://img.shields.io/npm/dm/jup-perps-client.svg)](https://www.npmjs.com/package/jup-perps-client)
-[![License](https://img.shields.io/npm/l/jup-perps-client.svg)](https://github.com/monakki/jup-perps-client/blob/master/LICENSE)
 [![TypeScript](https://img.shields.io/badge/TypeScript-Ready-blue.svg)](https://www.typescriptlang.org/)
 [![Bun](https://img.shields.io/badge/Bun-Ready-orange.svg)](https://bun.sh/)
+[![Codama](https://img.shields.io/badge/Codama-Generator-green.svg)](https://github.com/codama-idl/codama)
+[![License](https://img.shields.io/npm/l/jup-perps-client.svg)](https://github.com/monakki/jup-perps-client/blob/main/LICENSE.txt)
 
-A TypeScript client for Jupiter Perpetuals Protocol, auto-generated from IDL using Codama.
+**Development repository** for generating TypeScript client for Jupiter Perpetuals Protocol from IDL using Codama.
 
-## 🚀 Installation
+> **📦 Looking to use the client?** Check out the [npm package](https://www.npmjs.com/package/jup-perps-client) or see [js-client/README.md](js-client/README.md) for usage instructions.
 
-```bash
-npm install jup-perps-client
-# or
-yarn add jup-perps-client  
-# or
-pnpm add jup-perps-client
-# or
-bun add jup-perps-client
-```
+## 🛠️ Development Setup
 
-## 📦 Dependencies
+### Prerequisites
 
-The client uses `@solana/kit` for Solana interaction:
+- [Bun](https://bun.sh/) runtime (recommended)
+- Node.js ≥ 24.0.0 (alternative)
+- Git
 
-```bash
-npm install @solana/kit
-# or
-yarn add @solana/kit
-# or  
-pnpm add @solana/kit
-# or
-bun add @solana/kit
-```
+### Clone and Setup
 
-## 🔧 Usage
-
-### Basic Example
-
-```typescript
-import { createSolanaRpc, type Address } from '@solana/kit'
-import { 
-  fetchPool,
-  fetchPerpetuals,
-  fetchPosition,
-  fetchCustody
-} from 'jup-perps-client'
-
-// Create RPC connection
-const rpc = createSolanaRpc('https://api.mainnet-beta.solana.com')
-
-// Fetch pool data
-const poolAddress = '5BUwFW4nRbftYTDMbgxykoFWqWHPzahFSNAaaaJtVKsq' as Address
-const pool = await fetchPool(rpc, poolAddress)
-
-console.log('Pool Name:', pool.data.name)
-console.log('AUM:', pool.data.aumUsd.toString())
-console.log('Custodies:', pool.data.custodies.length)
-```
-
-### Protocol Data
-
-```typescript
-import { 
-  fetchPerpetuals,
-  identifyPerpetualsAccount,
-  PerpetualsAccount 
-} from 'jup-perps-client'
-
-// Fetch main protocol account
-const perpetualsAddress = 'H6ARHf6YXhGYeQfUzQNGk6rDNnLBQKrenN712K4AQJEG' as Address
-const perpetuals = await fetchPerpetuals(rpc, perpetualsAddress)
-
-console.log('Admin:', perpetuals.data.admin)
-console.log('Pools:', perpetuals.data.pools.length)
-console.log('Inception Time:', perpetuals.data.inceptionTime)
-```
-
-### Account Type Identification
-
-```typescript
-import { 
-  identifyPerpetualsAccount,
-  PerpetualsAccount 
-} from 'jup-perps-client'
-
-// Get account data
-const accountInfo = await rpc.getAccountInfo(someAddress).send()
-
-if (accountInfo.value) {
-  try {
-    const accountType = identifyPerpetualsAccount(accountInfo.value.data)
-    
-    switch (accountType) {
-      case PerpetualsAccount.Pool:
-        console.log('This is a liquidity pool')
-        const pool = await fetchPool(rpc, someAddress)
-        break
-        
-      case PerpetualsAccount.Position:
-        console.log('This is a trader position')
-        const position = await fetchPosition(rpc, someAddress)
-        break
-        
-      case PerpetualsAccount.Custody:
-        console.log('This is a token custody')
-        const custody = await fetchCustody(rpc, someAddress)
-        break
-        
-      default:
-        console.log('Unknown account type')
-    }
-  } catch (error) {
-    console.log('Account is not related to Jupiter Perps')
-  }
-}
-```
-
-### Working with Positions
-
-```typescript
-import { fetchPosition, fetchCustody } from 'jup-perps-client'
-
-const positionAddress = 'YOUR_POSITION_ADDRESS' as Address
-const position = await fetchPosition(rpc, positionAddress)
-
-console.log('Position Owner:', position.data.owner)
-console.log('Position Size:', position.data.sizeUsd.toString())
-console.log('Entry Price:', position.data.priceUsd.toString())
-```
-
-### Error Handling Example
-
-```typescript
-import { fetchPool } from 'jup-perps-client'
-
-async function getPoolInfo(poolAddress: Address) {
-  try {
-    const pool = await fetchPool(rpc, poolAddress)
-    
-    return {
-      name: pool.data.name,
-      aum: pool.data.aumUsd.toString(),
-      custodies: pool.data.custodies.length,
-      fees: pool.data.fees,
-      inception: new Date(Number(pool.data.inceptionTime) * 1000)
-    }
-  } catch (error) {
-    console.error('Failed to fetch pool:', error)
-    throw error
-  }
-}
-
-// Usage
-const poolInfo = await getPoolInfo(poolAddress)
-console.log('Pool Info:', poolInfo)
-```
-
-## 📚 API Reference
-
-### Account Functions
-
-#### Main Functions
-- `fetchPerpetuals(rpc, address)` - Get main protocol data
-- `fetchPool(rpc, address)` - Get liquidity pool data  
-- `fetchPosition(rpc, address)` - Get position data
-- `fetchCustody(rpc, address)` - Get token custody data
-- `fetchTokenLedger(rpc, address)` - Get token ledger data
-- `fetchPositionRequest(rpc, address)` - Get position request data
-
-#### Batch Functions
-- `fetchAllPerpetuals(rpc, addresses)` - Fetch multiple protocol accounts
-- `fetchAllPool(rpc, addresses)` - Fetch multiple pools
-- `fetchAllPosition(rpc, addresses)` - Fetch multiple positions
-
-#### Safe Functions (Maybe variants)
-- `fetchMaybePerpetuals(rpc, address)` - Safe protocol data fetch
-- `fetchMaybePool(rpc, address)` - Safe pool data fetch
-- `fetchMaybePosition(rpc, address)` - Safe position data fetch
-
-### Utility Functions
-
-#### Type Identification
-- `identifyPerpetualsAccount(data)` - Identify Jupiter Perps account type
-- `identifyPerpetualsInstruction(data)` - Identify instruction type
-
-#### Enums
-- `PerpetualsAccount` - Account types (Pool, Position, Custody, etc.)
-- `PerpetualsInstruction` - Instruction types
-
-### Constants
-
-```typescript
-import { PERPETUALS_PROGRAM_ADDRESS } from 'jup-perps-client'
-
-console.log('Program Address:', PERPETUALS_PROGRAM_ADDRESS)
-// Note: May be empty in current version
-```
-
-### TypeScript Types
-
-All data types are automatically imported:
-
-```typescript
-import type { 
-  Perpetuals,
-  Pool, 
-  Position,
-  Custody,
-  PositionRequest,
-  TokenLedger,
-  // ... and many more
-} from 'jup-perps-client'
-```
-
-## 🛠️ Development
-
-### Build from Source
-
-> **Note:** This repository does not include the built files (`dist/`) or generated code (`src/generated/`).
-> After cloning, you must generate the client and build the package before use.
+> **Note:** This repository does not include generated files. You must run the generator to create the client.
 
 ```bash
-git clone https://github.com/yourmonakki/jup-perps-client.git
+git clone https://github.com/monakki/jup-perps-client.git
 cd jup-perps-client
 bun install
-bun run generate    # Generates TypeScript client from IDL into src/generated/
-bun run build       # Builds the package into dist/
+bun build:js    # Generate and build the JS client
 ```
 
-### Development Scripts
+## 🔧 Generate Client
+
+### Quick Start
+
+```bash
+bun build:js    # Generate and build TypeScript client
+bun example     # Test the generated client
+```
+
+### Generator Features
+
+- **IDL Processing**: Converts Jupiter Perpetuals IDL to TypeScript using Codama
+- **Program Address Injection**: Automatically sets correct program address
+- **Type Generation**: Full TypeScript definitions for all accounts and instructions
+- **JSDoc Enhancement**: Adds comprehensive documentation to generated code
+- **Modular Output**: Organized structure with accounts/, instructions/, types/, programs/
+
+### Generated Structure
+
+```
+js-client/
+├── src/
+│   ├── accounts/          # Account fetchers (fetchPool, fetchCustody, etc.)
+│   ├── instructions/      # Instruction builders 
+│   ├── types/            # TypeScript type definitions
+│   ├── programs/         # Program constants and utilities
+│   └── index.ts          # Main exports
+├── dist/                 # Compiled JavaScript + TypeScript definitions
+└── example.ts           # Usage example
+```
+
+## 📁 Project Structure
+
+```
+jupiter-perps-client/
+├── generator/
+│   ├── idl/
+│   │   └── jupiter-perpetuals.json    # Source IDL file
+│   └── js/
+│       ├── generate.ts               # Main generator script
+│       └── add-jsdoc.ts             # JSDoc enhancement
+├── js-client/                       # Generated client package
+│   ├── src/                        # Generated TypeScript source
+│   ├── dist/                       # Compiled JavaScript + definitions
+│   ├── example.ts                  # Usage example
+│   ├── package.json                # Package configuration
+│   └── README.md                   # Usage documentation
+├── package.json                    # Development scripts
+└── README.md                      # This file (development docs)
+```
+
+### Development Commands
 
 ```bash
 # Generate TypeScript client from IDL
-bun run generate
+bun generate
 
-# Build production package
-bun run build
+# Compile TypeScript to JavaScript + add JSDoc
+bun compile
+
+# Full build process (generate + compile)
+bun build:js
 
 # Run example (test client functionality)
-bun run example
+bun example
 
-# Development mode with hot reload
-bun run dev
+# Format code
+bun format
+
+# Lint code
+bun lint
+
+# Check code (format + lint)
+bun check
 ```
 
-### Project Structure
-
-```
-├── src/
-│   ├── index.ts           # Main entry point
-│   └── generated/         # Auto-generated client code (ignored in git)
-├── idl/
-│   └── jupiter-perpetuals.json  # Jupiter Perpetuals IDL
-├── generate-client.ts     # Codama client generation script
-├── add-jsdoc.ts          # JSDoc automation script
-└── example.ts            # Usage example
-```
 
 ### How It Works
 
-1. **IDL Processing**: `generate-client.ts` uses Codama to convert IDL to TypeScript
-2. **JSDoc Enhancement**: `add-jsdoc.ts` adds comprehensive documentation
-3. **Building**: TypeScript compilation creates the final package in `dist/`
+1. **IDL Processing**: `generator/js/generate.ts` uses Codama to convert IDL to TypeScript
+2. **Program Address Injection**: `updateProgramsVisitor` sets the correct program address
+3. **JSDoc Enhancement**: `generator/js/add-jsdoc.ts` adds comprehensive documentation
+4. **Building**: TypeScript compilation creates the final package in `js-client/dist/`
 
-### Updating the Client
+### Updating IDL
+
+When Jupiter releases a new IDL version:
 
 ```bash
-# When Jupiter updates their IDL:
-# 1. Replace idl/jupiter-perpetuals.json with new IDL
-# 2. Regenerate client
-bun run generate
-bun run build
+# 1. Replace the IDL file
+cp new-jupiter-perpetuals.json generator/idl/jupiter-perpetuals.json
 
-# The client will automatically update to support new features
+# 2. Regenerate the client
+bun build:js
+
+# 3. Test the changes
+bun example
+
+# 4. Update version and publish
+cd js-client
+npm version patch  # or minor/major
+npm publish
 ```
+
+### Making Changes to Generator
+
+To modify the generation process:
+
+1. Edit `generator/js/generate.ts` for core generation logic
+2. Edit `generator/js/add-jsdoc.ts` for documentation improvements  
+3. Run `bun build:js` to see changes
+4. Test with `bun example`
 
 ### Requirements
 
-- Node.js ≥ 20.0.0
+- Node.js ≥ 24.0.0
 - Bun (recommended) or npm ≥ 10.0.0
 - TypeScript for development
 
@@ -291,9 +156,8 @@ MIT
 This client is auto-generated from Jupiter Perpetuals IDL files using Codama.
 
 To make changes:
-1. Update IDL files in `idl/` folder
-2. Run `bun run generate`
-3. Rebuild package with `bun run build`
+1. Update IDL files in `generator/idl/` folder
+2. Rebuild package with `bun build:js`
 
 ## 🔗 Links
 
