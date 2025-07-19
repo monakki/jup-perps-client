@@ -9,19 +9,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 ## [Unreleased] - 2025-07-19
 
-### Added
+### Added - Multi-Language Support
+- **Rust Client Generator**: Full Rust client generation alongside TypeScript
+- **Dual-language architecture**: Both TypeScript and Rust clients from single IDL
+- **Rust Documentation**: Comprehensive Rustdoc comments generation (`generator/rust/add-rust-docs.ts`)
+- **Rust Import Fixing**: Solana compatibility fixes (`generator/rust/fix-imports.ts`)
+- **Parallel Generation**: Optimized multi-language build pipeline
+- **Environment Variables**: `SOLANA_RPC_URL` support for both clients
+- **Feature-gated Rust**: `fetch` feature enabled by default for better UX
+
+### Added - Development Improvements
 - Separated development repository structure from npm package
 - Created dedicated generator in `generator/` directory with IDL and scripts
 - Added `updateProgramsVisitor` to properly inject program addresses from IDL
 - Enhanced JSDoc generation with improved `generator/js/add-jsdoc.ts`
 - Cross-platform compatibility for examples (Node.js and Bun support)
 - Comprehensive development documentation in root README
-- Separated README structure: root for development, js-client for usage
+- Separated README structure: root for development, clients for usage
 
 ### Changed
-- Moved IDL file to `generator/idl/jupiter-perpetuals.json`
-- Restructured project as monorepo with separate client package in `js-client/`
-- Updated build scripts to use `build:js` naming convention
+- **Repository Structure**: Multi-language monorepo with `jup-perps-client-js/` and `jup-perps-client-rust/`
+- **Build System**: Unified commands for both languages (`build:js`, `build:rust`, `example:js`, `example:rust`)
+- **Generator Architecture**: Modular generators in `generator/js/` and `generator/rust/`
+- **Package Names**: Descriptive directory names (`jup-perps-client-js`, `jup-perps-client-rust`)
+- **Command Structure**: Added `compile:js`, `compile:rust` for granular control
 - Enhanced generator to create complete modular dist structure
 - Improved development workflow with proper script separation
 
@@ -33,21 +44,30 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - TypeScript compatibility issues with custody address handling
 
 ### Technical Implementation
-- Implemented Codama-based generation pipeline with program address injection
-- Added `updateProgramsVisitor` for proper program address: `PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu`
+- **Multi-Language Pipeline**: Codama generates both TypeScript and Rust from single IDL
+- **Rust Client Features**: 
+  - Built-in RPC client support with `fetch` feature enabled by default
+  - Comprehensive error handling and type safety
+  - Environment variable configuration (`SOLANA_RPC_URL`)
+  - Automatic Solana dependency compatibility
+- **Documentation Systems**: JSDoc for TypeScript, Rustdoc for Rust
+- **Program Address Injection**: `PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu`
+- **Parallel Build System**: Optimized generation and compilation for both languages
 - Created modular compilation structure with full TypeScript definitions
-- Enhanced JSDoc automation for better developer experience
-- Separated development concerns from package distribution
+- Enhanced automation for better developer experience across languages
 
 ### Repository Structure
 ```
 jupiter-perps-client/
-├── generator/              # IDL to TypeScript generation
-│   ├── idl/               # Source IDL files
-│   └── js/                # Generator scripts (generate.ts, add-jsdoc.ts)
-├── js-client/             # Generated npm package (published to npm)
-├── CHANGELOG.md           # Development changelog (this file)
-└── README.md              # Development documentation
+├── generator/                    # Multi-language IDL generation
+│   ├── idl/                     # Source IDL files
+│   ├── js/                      # TypeScript generator (generate.ts, add-jsdoc.ts)
+│   ├── rust/                    # Rust generator (generate.ts, add-rust-docs.ts, fix-imports.ts)
+│   └── generate-all.ts          # Multi-language build coordinator
+├── jup-perps-client-js/         # Generated TypeScript/JavaScript client
+├── jup-perps-client-rust/       # Generated Rust client
+├── CHANGELOG.md                 # Development changelog (this file)
+└── README.md                    # Development documentation
 ```
 
 ## [1.0.0] - 2025-07-14

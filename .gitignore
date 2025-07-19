@@ -8,6 +8,13 @@ out
 dist
 *.tgz
 
+# client build outputs (keep source generated code)
+jup-perps-client-js/dist/
+jup-perps-client-js/build/
+jup-perps-client-rust/dist/
+jup-perps-client-rust/build/
+jup-perps-client-rust/target/
+
 # generated files
 src/generated/
 

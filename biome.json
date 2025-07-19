@@ -7,7 +7,12 @@
 	},
 	"files": {
 		"ignoreUnknown": false,
-		"includes": ["**", "!js-client/src", "!js-client/dist"]
+		"includes": [
+			"**",
+			"!jup-perps-client-js/src",
+			"!jup-perps-client-js/dist",
+			"!jup-perps-client-rust/**"
+		]
 	},
 	"formatter": {
 		"enabled": true,

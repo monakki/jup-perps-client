@@ -8,7 +8,7 @@ import { createFromRoot } from 'codama'
 import anchorIdl from '../idl/jupiter-perpetuals.json'
 
 // Constants
-const CLIENT_DIR = 'js-client'
+const CLIENT_DIR = 'jup-perps-client-js'
 const SRC_DIR = `${CLIENT_DIR}/src`
 export const OUTPUT_PATH = CLIENT_DIR
 
