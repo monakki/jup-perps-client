@@ -165,6 +165,19 @@ if (accountInfo.value) {
 }
 ```
 
+### Working with Borrow Positions
+
+```typescript
+import { fetchBorrowPosition } from 'jup-perps-client'
+
+const borrowPositionAddress = 'YOUR_BORROW_POSITION_ADDRESS' as Address
+const borrowPosition = await fetchBorrowPosition(rpc, borrowPositionAddress)
+
+console.log('Owner:', borrowPosition.data.owner)
+console.log('Custody:', borrowPosition.data.custody)
+console.log('Collateral Amount:', borrowPosition.data.collateralAmount.toString())
+```
+
 ### Working with Positions
 
 ```typescript
@@ -216,16 +229,19 @@ console.log('Pool Info:', poolInfo)
 - `fetchCustody(rpc, address)` - Get token custody data
 - `fetchTokenLedger(rpc, address)` - Get token ledger data
 - `fetchPositionRequest(rpc, address)` - Get position request data
+- `fetchBorrowPosition(rpc, address)` - Get borrow position data
 
 #### Batch Functions
 - `fetchAllPerpetuals(rpc, addresses)` - Fetch multiple protocol accounts
 - `fetchAllPool(rpc, addresses)` - Fetch multiple pools
 - `fetchAllPosition(rpc, addresses)` - Fetch multiple positions
+- `fetchAllBorrowPosition(rpc, addresses)` - Fetch multiple borrow positions
 
 #### Safe Functions (Maybe variants)
 - `fetchMaybePerpetuals(rpc, address)` - Safe protocol data fetch
 - `fetchMaybePool(rpc, address)` - Safe pool data fetch
 - `fetchMaybePosition(rpc, address)` - Safe position data fetch
+- `fetchMaybeBorrowPosition(rpc, address)` - Safe borrow position data fetch
 
 ### Utility Functions
 

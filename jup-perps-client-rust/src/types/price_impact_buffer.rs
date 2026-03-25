@@ -5,19 +5,17 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PriceImpactBuffer {
-#[cfg_attr(feature = "serde", serde(with = "serde_big_array::BigArray"))]
-pub open_interest: [i64; 60],
-pub last_updated: i64,
-pub fee_factor: u64,
-pub exponent: f32,
-pub delta_imbalance_threshold_decimal: u64,
-pub max_fee_bps: u64,
+    #[cfg_attr(feature = "serde", serde(with = "serde_big_array::BigArray"))]
+    pub open_interest: [i64; 60],
+    pub last_updated: i64,
+    pub fee_factor: u64,
+    pub exponent: f32,
+    pub delta_imbalance_threshold_decimal: u64,
+    pub max_fee_bps: u64,
 }
-
-

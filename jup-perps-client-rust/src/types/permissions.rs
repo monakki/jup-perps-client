@@ -5,19 +5,17 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct Permissions {
-pub allow_swap: bool,
-pub allow_add_liquidity: bool,
-pub allow_remove_liquidity: bool,
-pub allow_increase_position: bool,
-pub allow_decrease_position: bool,
-pub allow_collateral_withdrawal: bool,
-pub allow_liquidate_position: bool,
+    pub allow_swap: bool,
+    pub allow_add_liquidity: bool,
+    pub allow_remove_liquidity: bool,
+    pub allow_increase_position: bool,
+    pub allow_decrease_position: bool,
+    pub allow_collateral_withdrawal: bool,
+    pub allow_liquidate_position: bool,
 }
-
-

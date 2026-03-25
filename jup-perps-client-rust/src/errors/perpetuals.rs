@@ -178,7 +178,43 @@ pub enum PerpetualsError {
     /// 6055 - Oracle Price Difference Too Large
     #[error("Oracle Price Difference Too Large")]
     OraclePriceDifferenceTooLarge = 0x17A7,
+    /// 6056 - Invalid Oracle Signer
+    #[error("Invalid Oracle Signer")]
+    InvalidOracleSigner = 0x17A8,
+    /// 6057 - Invalid Oracle Timestamp
+    #[error("Invalid Oracle Timestamp")]
+    InvalidOracleTimestamp = 0x17A9,
+    /// 6058 - New Max Global Long Size Too Low
+    #[error("New Max Global Long Size Too Low")]
+    InvalidMaxGlobalLongSize = 0x17AA,
+    /// 6059 - New Max Global Short Size Too Low
+    #[error("New Max Global Short Size Too Low")]
+    InvalidMaxGlobalShortSize = 0x17AB,
+    /// 6060 - Borrows disabled for this custody
+    #[error("Borrows disabled for this custody")]
+    BorrowsDisabled = 0x17AC,
+    /// 6061 - Borrows limit exceeded for this custody
+    #[error("Borrows limit exceeded for this custody")]
+    BorrowLimitsExceeded = 0x17AD,
+    /// 6062 - Withdraw exceeds margin of the custody
+    #[error("Withdraw exceeds margin of the custody")]
+    WithdrawExceedsMarginLimits = 0x17AE,
+    /// 6063 - Cannot liquidate
+    #[error("Cannot liquidate")]
+    CannotLiquidate = 0x17AF,
+    /// 6064 - Cannot delegate stake to deactivated account
+    #[error("Cannot delegate stake to deactivated account")]
+    CannotDelegateStake = 0x17B0,
+    /// 6065 - Max total staked amount exceeded
+    #[error("Max total staked amount exceeded")]
+    ExceededMaxTotalStakedAmount = 0x17B1,
+    /// 6066 - LP token price change exceeds limit
+    #[error("LP token price change exceeds limit")]
+    LpTokenPriceChangeLimitExceeded = 0x17B2,
 }
 
-// PrintProgramError trait is deprecated - removed implementation for PerpetualsError
-// DecodeError trait is deprecated - removed implementation for PerpetualsError
+impl From<PerpetualsError> for solana_program::program_error::ProgramError {
+    fn from(e: PerpetualsError) -> Self {
+        solana_program::program_error::ProgramError::Custom(e as u32)
+    }
+}

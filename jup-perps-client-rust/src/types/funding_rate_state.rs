@@ -5,15 +5,13 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct FundingRateState {
-pub cumulative_interest_rate: u128,
-pub last_update: i64,
-pub hourly_funding_dbps: u64,
+    pub cumulative_interest_rate: u128,
+    pub last_update: i64,
+    pub hourly_funding_dbps: u64,
 }
-
-

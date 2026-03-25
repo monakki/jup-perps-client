@@ -5,16 +5,14 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct JumpRateState {
-pub min_rate_bps: u64,
-pub max_rate_bps: u64,
-pub target_rate_bps: u64,
-pub target_utilization_rate: u64,
+    pub min_rate_bps: u64,
+    pub max_rate_bps: u64,
+    pub target_rate_bps: u64,
+    pub target_utilization_rate: u64,
 }
-
-

@@ -5,15 +5,13 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PoolApr {
-pub last_updated: i64,
-pub fee_apr_bps: u64,
-pub realized_fee_usd: u64,
+    pub last_updated: i64,
+    pub fee_apr_bps: u64,
+    pub realized_fee_usd: u64,
 }
-
-

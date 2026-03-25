@@ -5,16 +5,13 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Position and pool size limits
 pub struct Limit {
-pub max_aum_usd: u128,
-pub token_weightage_buffer_bps: u128,
-pub buffer: u64,
+    pub max_aum_usd: u128,
+    pub token_weightage_buffer_bps: u128,
+    pub buffer: u64,
 }
-
-

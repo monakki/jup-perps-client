@@ -16,6 +16,11 @@ const IMPORT_FIXES = [
 	// Fix other problematic imports
 	{ from: /solana_program_error::/g, to: 'solana_program::program_error::' },
 	{ from: /solana_decode_error::/g, to: 'solana_program::decode_error::' },
+	// Fix ProgramResult - moved from program_error to entrypoint in newer solana-program versions
+	{
+		from: /solana_program::program_error::ProgramResult/g,
+		to: 'solana_program::entrypoint::ProgramResult',
+	},
 
 	// Fix deprecated traits - remove entire impl blocks (multiline aware)
 	{

@@ -7,380 +7,543 @@
 
 use crate::types::Fees;
 use crate::types::Limit;
-use borsh::{BorshSerialize, BorshDeserialize};
+use crate::types::Secp256k1Pubkey;
+use borsh::{BorshDeserialize, BorshSerialize};
+
+pub const SET_POOL_CONFIG_DISCRIMINATOR: [u8; 8] = [216, 87, 65, 125, 113, 110, 185, 120];
 
 /// Accounts.
 #[derive(Debug)]
 pub struct SetPoolConfig {
-      
-              
-          pub admin: solana_program::pubkey::Pubkey,
-          
-              
-          pub perpetuals: solana_program::pubkey::Pubkey,
-          
-              
-          pub pool: solana_program::pubkey::Pubkey,
-      }
+    pub admin: solana_program::pubkey::Pubkey,
+
+    pub perpetuals: solana_program::pubkey::Pubkey,
+
+    pub pool: solana_program::pubkey::Pubkey,
+}
 
 impl SetPoolConfig {
-  pub fn instruction(&self, args: SetPoolConfigInstructionArgs) -> solana_program::instruction::Instruction {
-    self.instruction_with_remaining_accounts(args, &[])
-  }
-  #[allow(clippy::arithmetic_side_effects)]
-  #[allow(clippy::vec_init_then_push)]
-  pub fn instruction_with_remaining_accounts(&self, args: SetPoolConfigInstructionArgs, remaining_accounts: &[solana_program::instruction::AccountMeta]) -> solana_program::instruction::Instruction {
-    let mut accounts = Vec::with_capacity(3+ remaining_accounts.len());
-                            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            self.admin,
-            true
-          ));
-                                          accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            self.perpetuals,
-            false
-          ));
-                                          accounts.push(solana_program::instruction::AccountMeta::new(
-            self.pool,
-            false
-          ));
-                      accounts.extend_from_slice(remaining_accounts);
-    let mut data = borsh::to_vec(&SetPoolConfigInstructionData::new()).unwrap();
-          let mut args = borsh::to_vec(&args).unwrap();
-      data.append(&mut args);
-    
-    solana_program::instruction::Instruction {
-      program_id: crate::PERPETUALS_ID,
-      accounts,
-      data,
+    pub fn instruction(
+        &self,
+        args: SetPoolConfigInstructionArgs,
+    ) -> solana_program::instruction::Instruction {
+        self.instruction_with_remaining_accounts(args, &[])
     }
-  }
+    #[allow(clippy::arithmetic_side_effects)]
+    #[allow(clippy::vec_init_then_push)]
+    pub fn instruction_with_remaining_accounts(
+        &self,
+        args: SetPoolConfigInstructionArgs,
+        remaining_accounts: &[solana_program::instruction::AccountMeta],
+    ) -> solana_program::instruction::Instruction {
+        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            self.admin, true,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            self.perpetuals,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            self.pool, false,
+        ));
+        accounts.extend_from_slice(remaining_accounts);
+        let mut data = borsh::to_vec(&SetPoolConfigInstructionData::new()).unwrap();
+        let mut args = borsh::to_vec(&args).unwrap();
+        data.append(&mut args);
+
+        solana_program::instruction::Instruction {
+            program_id: crate::PERPETUALS_ID,
+            accounts,
+            data,
+        }
+    }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct SetPoolConfigInstructionData {
-            discriminator: [u8; 8],
-                        }
+pub struct SetPoolConfigInstructionData {
+    discriminator: [u8; 8],
+}
 
 impl SetPoolConfigInstructionData {
-  pub fn new() -> Self {
-    Self {
-                        discriminator: [216, 87, 65, 125, 113, 110, 185, 120],
-                                                            }
-  }
+    pub fn new() -> Self {
+        Self {
+            discriminator: [216, 87, 65, 125, 113, 110, 185, 120],
+        }
+    }
 }
 
 impl Default for SetPoolConfigInstructionData {
-  fn default() -> Self {
-    Self::new()
-  }
+    fn default() -> Self {
+        Self::new()
+    }
 }
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
- pub struct SetPoolConfigInstructionArgs {
-                  pub fees: Fees,
-                pub limit: Limit,
-                pub max_request_execution_sec: i64,
-      }
-
+pub struct SetPoolConfigInstructionArgs {
+    pub fees: Fees,
+    pub limit: Limit,
+    pub max_request_execution_sec: i64,
+    pub parameter_update_oracle: Secp256k1Pubkey,
+    pub max_trigger_price_diff_bps: u64,
+    pub disable_close_position_request: bool,
+    pub max_lp_token_price_change_bps: u64,
+}
 
 /// Instruction builder for `SetPoolConfig`.
 ///
 /// ### Accounts:
 ///
-                ///   0. `[signer]` admin
-          ///   1. `[]` perpetuals
-                ///   2. `[writable]` pool
+///   0. `[signer]` admin
+///   1. `[]` perpetuals
+///   2. `[writable]` pool
 #[derive(Clone, Debug, Default)]
 pub struct SetPoolConfigBuilder {
-            admin: Option<solana_program::pubkey::Pubkey>,
-                perpetuals: Option<solana_program::pubkey::Pubkey>,
-                pool: Option<solana_program::pubkey::Pubkey>,
-                        fees: Option<Fees>,
-                limit: Option<Limit>,
-                max_request_execution_sec: Option<i64>,
-        __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
+    admin: Option<solana_program::pubkey::Pubkey>,
+    perpetuals: Option<solana_program::pubkey::Pubkey>,
+    pool: Option<solana_program::pubkey::Pubkey>,
+    fees: Option<Fees>,
+    limit: Option<Limit>,
+    max_request_execution_sec: Option<i64>,
+    parameter_update_oracle: Option<Secp256k1Pubkey>,
+    max_trigger_price_diff_bps: Option<u64>,
+    disable_close_position_request: Option<bool>,
+    max_lp_token_price_change_bps: Option<u64>,
+    __remaining_accounts: Vec<solana_program::instruction::AccountMeta>,
 }
 
 impl SetPoolConfigBuilder {
-  pub fn new() -> Self {
-    Self::default()
-  }
-            #[inline(always)]
+    pub fn new() -> Self {
+        Self::default()
+    }
+    #[inline(always)]
     pub fn admin(&mut self, admin: solana_program::pubkey::Pubkey) -> &mut Self {
-                        self.admin = Some(admin);
-                    self
+        self.admin = Some(admin);
+        self
     }
-            #[inline(always)]
+    #[inline(always)]
     pub fn perpetuals(&mut self, perpetuals: solana_program::pubkey::Pubkey) -> &mut Self {
-                        self.perpetuals = Some(perpetuals);
-                    self
+        self.perpetuals = Some(perpetuals);
+        self
     }
-            #[inline(always)]
+    #[inline(always)]
     pub fn pool(&mut self, pool: solana_program::pubkey::Pubkey) -> &mut Self {
-                        self.pool = Some(pool);
-                    self
+        self.pool = Some(pool);
+        self
     }
-                    #[inline(always)]
-      pub fn fees(&mut self, fees: Fees) -> &mut Self {
+    #[inline(always)]
+    pub fn fees(&mut self, fees: Fees) -> &mut Self {
         self.fees = Some(fees);
         self
-      }
-                #[inline(always)]
-      pub fn limit(&mut self, limit: Limit) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn limit(&mut self, limit: Limit) -> &mut Self {
         self.limit = Some(limit);
         self
-      }
-                #[inline(always)]
-      pub fn max_request_execution_sec(&mut self, max_request_execution_sec: i64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn max_request_execution_sec(&mut self, max_request_execution_sec: i64) -> &mut Self {
         self.max_request_execution_sec = Some(max_request_execution_sec);
         self
-      }
-        /// Add an additional account to the instruction.
-  #[inline(always)]
-  pub fn add_remaining_account(&mut self, account: solana_program::instruction::AccountMeta) -> &mut Self {
-    self.__remaining_accounts.push(account);
-    self
-  }
-  /// Add additional accounts to the instruction.
-  #[inline(always)]
-  pub fn add_remaining_accounts(&mut self, accounts: &[solana_program::instruction::AccountMeta]) -> &mut Self {
-    self.__remaining_accounts.extend_from_slice(accounts);
-    self
-  }
-  #[allow(clippy::clone_on_copy)]
-  pub fn instruction(&self) -> solana_program::instruction::Instruction {
-    let accounts = SetPoolConfig {
-                              admin: self.admin.expect("admin is not set"),
-                                        perpetuals: self.perpetuals.expect("perpetuals is not set"),
-                                        pool: self.pool.expect("pool is not set"),
-                      };
-          let args = SetPoolConfigInstructionArgs {
-                                                              fees: self.fees.clone().expect("fees is not set"),
-                                                                  limit: self.limit.clone().expect("limit is not set"),
-                                                                  max_request_execution_sec: self.max_request_execution_sec.clone().expect("max_request_execution_sec is not set"),
-                                    };
-    
-    accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
-  }
+    }
+    #[inline(always)]
+    pub fn parameter_update_oracle(
+        &mut self,
+        parameter_update_oracle: Secp256k1Pubkey,
+    ) -> &mut Self {
+        self.parameter_update_oracle = Some(parameter_update_oracle);
+        self
+    }
+    #[inline(always)]
+    pub fn max_trigger_price_diff_bps(&mut self, max_trigger_price_diff_bps: u64) -> &mut Self {
+        self.max_trigger_price_diff_bps = Some(max_trigger_price_diff_bps);
+        self
+    }
+    #[inline(always)]
+    pub fn disable_close_position_request(
+        &mut self,
+        disable_close_position_request: bool,
+    ) -> &mut Self {
+        self.disable_close_position_request = Some(disable_close_position_request);
+        self
+    }
+    #[inline(always)]
+    pub fn max_lp_token_price_change_bps(
+        &mut self,
+        max_lp_token_price_change_bps: u64,
+    ) -> &mut Self {
+        self.max_lp_token_price_change_bps = Some(max_lp_token_price_change_bps);
+        self
+    }
+    /// Add an additional account to the instruction.
+    #[inline(always)]
+    pub fn add_remaining_account(
+        &mut self,
+        account: solana_program::instruction::AccountMeta,
+    ) -> &mut Self {
+        self.__remaining_accounts.push(account);
+        self
+    }
+    /// Add additional accounts to the instruction.
+    #[inline(always)]
+    pub fn add_remaining_accounts(
+        &mut self,
+        accounts: &[solana_program::instruction::AccountMeta],
+    ) -> &mut Self {
+        self.__remaining_accounts.extend_from_slice(accounts);
+        self
+    }
+    #[allow(clippy::clone_on_copy)]
+    pub fn instruction(&self) -> solana_program::instruction::Instruction {
+        let accounts = SetPoolConfig {
+            admin: self.admin.expect("admin is not set"),
+            perpetuals: self.perpetuals.expect("perpetuals is not set"),
+            pool: self.pool.expect("pool is not set"),
+        };
+        let args = SetPoolConfigInstructionArgs {
+            fees: self.fees.clone().expect("fees is not set"),
+            limit: self.limit.clone().expect("limit is not set"),
+            max_request_execution_sec: self
+                .max_request_execution_sec
+                .clone()
+                .expect("max_request_execution_sec is not set"),
+            parameter_update_oracle: self
+                .parameter_update_oracle
+                .clone()
+                .expect("parameter_update_oracle is not set"),
+            max_trigger_price_diff_bps: self
+                .max_trigger_price_diff_bps
+                .clone()
+                .expect("max_trigger_price_diff_bps is not set"),
+            disable_close_position_request: self
+                .disable_close_position_request
+                .clone()
+                .expect("disable_close_position_request is not set"),
+            max_lp_token_price_change_bps: self
+                .max_lp_token_price_change_bps
+                .clone()
+                .expect("max_lp_token_price_change_bps is not set"),
+        };
+
+        accounts.instruction_with_remaining_accounts(args, &self.__remaining_accounts)
+    }
 }
 
-  /// `set_pool_config` CPI accounts.
-  pub struct SetPoolConfigCpiAccounts<'a, 'b> {
-          
-                    
-              pub admin: &'b solana_program::account_info::AccountInfo<'a>,
-                
-                    
-              pub perpetuals: &'b solana_program::account_info::AccountInfo<'a>,
-                
-                    
-              pub pool: &'b solana_program::account_info::AccountInfo<'a>,
-            }
+/// `set_pool_config` CPI accounts.
+pub struct SetPoolConfigCpiAccounts<'a, 'b> {
+    pub admin: &'b solana_program::account_info::AccountInfo<'a>,
+
+    pub perpetuals: &'b solana_program::account_info::AccountInfo<'a>,
+
+    pub pool: &'b solana_program::account_info::AccountInfo<'a>,
+}
 
 /// `set_pool_config` CPI instruction.
 pub struct SetPoolConfigCpi<'a, 'b> {
-  /// The program to invoke.
-  pub __program: &'b solana_program::account_info::AccountInfo<'a>,
-      
-              
-          pub admin: &'b solana_program::account_info::AccountInfo<'a>,
-          
-              
-          pub perpetuals: &'b solana_program::account_info::AccountInfo<'a>,
-          
-              
-          pub pool: &'b solana_program::account_info::AccountInfo<'a>,
-            /// The arguments for the instruction.
+    /// The program to invoke.
+    pub __program: &'b solana_program::account_info::AccountInfo<'a>,
+
+    pub admin: &'b solana_program::account_info::AccountInfo<'a>,
+
+    pub perpetuals: &'b solana_program::account_info::AccountInfo<'a>,
+
+    pub pool: &'b solana_program::account_info::AccountInfo<'a>,
+    /// The arguments for the instruction.
     pub __args: SetPoolConfigInstructionArgs,
-  }
+}
 
 impl<'a, 'b> SetPoolConfigCpi<'a, 'b> {
-  pub fn new(
-    program: &'b solana_program::account_info::AccountInfo<'a>,
-          accounts: SetPoolConfigCpiAccounts<'a, 'b>,
-              args: SetPoolConfigInstructionArgs,
-      ) -> Self {
-    Self {
-      __program: program,
-              admin: accounts.admin,
-              perpetuals: accounts.perpetuals,
-              pool: accounts.pool,
-                    __args: args,
-          }
-  }
-  #[inline(always)]
-  pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
-    self.invoke_signed_with_remaining_accounts(&[], &[])
-  }
-  #[inline(always)]
-  pub fn invoke_with_remaining_accounts(&self, remaining_accounts: &[(&'b solana_program::account_info::AccountInfo<'a>, bool, bool)]) -> solana_program::entrypoint::ProgramResult {
-    self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
-  }
-  #[inline(always)]
-  pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program::entrypoint::ProgramResult {
-    self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
-  }
-  #[allow(clippy::arithmetic_side_effects)]
-  #[allow(clippy::clone_on_copy)]
-  #[allow(clippy::vec_init_then_push)]
-  pub fn invoke_signed_with_remaining_accounts(
-    &self,
-    signers_seeds: &[&[&[u8]]],
-    remaining_accounts: &[(&'b solana_program::account_info::AccountInfo<'a>, bool, bool)]
-  ) -> solana_program::entrypoint::ProgramResult {
-    let mut accounts = Vec::with_capacity(3+ remaining_accounts.len());
-                            accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            *self.admin.key,
-            true
-          ));
-                                          accounts.push(solana_program::instruction::AccountMeta::new_readonly(
-            *self.perpetuals.key,
-            false
-          ));
-                                          accounts.push(solana_program::instruction::AccountMeta::new(
-            *self.pool.key,
-            false
-          ));
-                      remaining_accounts.iter().for_each(|remaining_account| {
-      accounts.push(solana_program::instruction::AccountMeta {
-          pubkey: *remaining_account.0.key,
-          is_signer: remaining_account.1,
-          is_writable: remaining_account.2,
-      })
-    });
-    let mut data = borsh::to_vec(&SetPoolConfigInstructionData::new()).unwrap();
-          let mut args = borsh::to_vec(&self.__args).unwrap();
-      data.append(&mut args);
-    
-    let instruction = solana_program::instruction::Instruction {
-      program_id: crate::PERPETUALS_ID,
-      accounts,
-      data,
-    };
-    let mut account_infos = Vec::with_capacity(4 + remaining_accounts.len());
-    account_infos.push(self.__program.clone());
-                  account_infos.push(self.admin.clone());
-                        account_infos.push(self.perpetuals.clone());
-                        account_infos.push(self.pool.clone());
-              remaining_accounts.iter().for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
-
-    if signers_seeds.is_empty() {
-      solana_program::program::invoke(&instruction, &account_infos)
-    } else {
-      solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+    pub fn new(
+        program: &'b solana_program::account_info::AccountInfo<'a>,
+        accounts: SetPoolConfigCpiAccounts<'a, 'b>,
+        args: SetPoolConfigInstructionArgs,
+    ) -> Self {
+        Self {
+            __program: program,
+            admin: accounts.admin,
+            perpetuals: accounts.perpetuals,
+            pool: accounts.pool,
+            __args: args,
+        }
     }
-  }
+    #[inline(always)]
+    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+        self.invoke_signed_with_remaining_accounts(&[], &[])
+    }
+    #[inline(always)]
+    pub fn invoke_with_remaining_accounts(
+        &self,
+        remaining_accounts: &[(
+            &'b solana_program::account_info::AccountInfo<'a>,
+            bool,
+            bool,
+        )],
+    ) -> solana_program::entrypoint::ProgramResult {
+        self.invoke_signed_with_remaining_accounts(&[], remaining_accounts)
+    }
+    #[inline(always)]
+    pub fn invoke_signed(
+        &self,
+        signers_seeds: &[&[&[u8]]],
+    ) -> solana_program::entrypoint::ProgramResult {
+        self.invoke_signed_with_remaining_accounts(signers_seeds, &[])
+    }
+    #[allow(clippy::arithmetic_side_effects)]
+    #[allow(clippy::clone_on_copy)]
+    #[allow(clippy::vec_init_then_push)]
+    pub fn invoke_signed_with_remaining_accounts(
+        &self,
+        signers_seeds: &[&[&[u8]]],
+        remaining_accounts: &[(
+            &'b solana_program::account_info::AccountInfo<'a>,
+            bool,
+            bool,
+        )],
+    ) -> solana_program::entrypoint::ProgramResult {
+        let mut accounts = Vec::with_capacity(3 + remaining_accounts.len());
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            *self.admin.key,
+            true,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new_readonly(
+            *self.perpetuals.key,
+            false,
+        ));
+        accounts.push(solana_program::instruction::AccountMeta::new(
+            *self.pool.key,
+            false,
+        ));
+        remaining_accounts.iter().for_each(|remaining_account| {
+            accounts.push(solana_program::instruction::AccountMeta {
+                pubkey: *remaining_account.0.key,
+                is_signer: remaining_account.1,
+                is_writable: remaining_account.2,
+            })
+        });
+        let mut data = borsh::to_vec(&SetPoolConfigInstructionData::new()).unwrap();
+        let mut args = borsh::to_vec(&self.__args).unwrap();
+        data.append(&mut args);
+
+        let instruction = solana_program::instruction::Instruction {
+            program_id: crate::PERPETUALS_ID,
+            accounts,
+            data,
+        };
+        let mut account_infos = Vec::with_capacity(4 + remaining_accounts.len());
+        account_infos.push(self.__program.clone());
+        account_infos.push(self.admin.clone());
+        account_infos.push(self.perpetuals.clone());
+        account_infos.push(self.pool.clone());
+        remaining_accounts
+            .iter()
+            .for_each(|remaining_account| account_infos.push(remaining_account.0.clone()));
+
+        if signers_seeds.is_empty() {
+            solana_program::program::invoke(&instruction, &account_infos)
+        } else {
+            solana_program::program::invoke_signed(&instruction, &account_infos, signers_seeds)
+        }
+    }
 }
 
 /// Instruction builder for `SetPoolConfig` via CPI.
 ///
 /// ### Accounts:
 ///
-                ///   0. `[signer]` admin
-          ///   1. `[]` perpetuals
-                ///   2. `[writable]` pool
+///   0. `[signer]` admin
+///   1. `[]` perpetuals
+///   2. `[writable]` pool
 #[derive(Clone, Debug)]
 pub struct SetPoolConfigCpiBuilder<'a, 'b> {
-  instruction: Box<SetPoolConfigCpiBuilderInstruction<'a, 'b>>,
+    instruction: Box<SetPoolConfigCpiBuilderInstruction<'a, 'b>>,
 }
 
 impl<'a, 'b> SetPoolConfigCpiBuilder<'a, 'b> {
-  pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
-    let instruction = Box::new(SetPoolConfigCpiBuilderInstruction {
-      __program: program,
-              admin: None,
-              perpetuals: None,
-              pool: None,
-                                            fees: None,
-                                limit: None,
-                                max_request_execution_sec: None,
-                    __remaining_accounts: Vec::new(),
-    });
-    Self { instruction }
-  }
-      #[inline(always)]
+    pub fn new(program: &'b solana_program::account_info::AccountInfo<'a>) -> Self {
+        let instruction = Box::new(SetPoolConfigCpiBuilderInstruction {
+            __program: program,
+            admin: None,
+            perpetuals: None,
+            pool: None,
+            fees: None,
+            limit: None,
+            max_request_execution_sec: None,
+            parameter_update_oracle: None,
+            max_trigger_price_diff_bps: None,
+            disable_close_position_request: None,
+            max_lp_token_price_change_bps: None,
+            __remaining_accounts: Vec::new(),
+        });
+        Self { instruction }
+    }
+    #[inline(always)]
     pub fn admin(&mut self, admin: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.admin = Some(admin);
-                    self
+        self.instruction.admin = Some(admin);
+        self
     }
-      #[inline(always)]
-    pub fn perpetuals(&mut self, perpetuals: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.perpetuals = Some(perpetuals);
-                    self
+    #[inline(always)]
+    pub fn perpetuals(
+        &mut self,
+        perpetuals: &'b solana_program::account_info::AccountInfo<'a>,
+    ) -> &mut Self {
+        self.instruction.perpetuals = Some(perpetuals);
+        self
     }
-      #[inline(always)]
+    #[inline(always)]
     pub fn pool(&mut self, pool: &'b solana_program::account_info::AccountInfo<'a>) -> &mut Self {
-                        self.instruction.pool = Some(pool);
-                    self
+        self.instruction.pool = Some(pool);
+        self
     }
-                    #[inline(always)]
-      pub fn fees(&mut self, fees: Fees) -> &mut Self {
+    #[inline(always)]
+    pub fn fees(&mut self, fees: Fees) -> &mut Self {
         self.instruction.fees = Some(fees);
         self
-      }
-                #[inline(always)]
-      pub fn limit(&mut self, limit: Limit) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn limit(&mut self, limit: Limit) -> &mut Self {
         self.instruction.limit = Some(limit);
         self
-      }
-                #[inline(always)]
-      pub fn max_request_execution_sec(&mut self, max_request_execution_sec: i64) -> &mut Self {
+    }
+    #[inline(always)]
+    pub fn max_request_execution_sec(&mut self, max_request_execution_sec: i64) -> &mut Self {
         self.instruction.max_request_execution_sec = Some(max_request_execution_sec);
         self
-      }
-        /// Add an additional account to the instruction.
-  #[inline(always)]
-  pub fn add_remaining_account(&mut self, account: &'b solana_program::account_info::AccountInfo<'a>, is_writable: bool, is_signer: bool) -> &mut Self {
-    self.instruction.__remaining_accounts.push((account, is_writable, is_signer));
-    self
-  }
-  /// Add additional accounts to the instruction.
-  ///
-  /// Each account is represented by a tuple of the `AccountInfo`, a `bool` indicating whether the account is writable or not,
-  /// and a `bool` indicating whether the account is a signer or not.
-  #[inline(always)]
-  pub fn add_remaining_accounts(&mut self, accounts: &[(&'b solana_program::account_info::AccountInfo<'a>, bool, bool)]) -> &mut Self {
-    self.instruction.__remaining_accounts.extend_from_slice(accounts);
-    self
-  }
-  #[inline(always)]
-  pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
-    self.invoke_signed(&[])
-  }
-  #[allow(clippy::clone_on_copy)]
-  #[allow(clippy::vec_init_then_push)]
-  pub fn invoke_signed(&self, signers_seeds: &[&[&[u8]]]) -> solana_program::entrypoint::ProgramResult {
-          let args = SetPoolConfigInstructionArgs {
-                                                              fees: self.instruction.fees.clone().expect("fees is not set"),
-                                                                  limit: self.instruction.limit.clone().expect("limit is not set"),
-                                                                  max_request_execution_sec: self.instruction.max_request_execution_sec.clone().expect("max_request_execution_sec is not set"),
-                                    };
+    }
+    #[inline(always)]
+    pub fn parameter_update_oracle(
+        &mut self,
+        parameter_update_oracle: Secp256k1Pubkey,
+    ) -> &mut Self {
+        self.instruction.parameter_update_oracle = Some(parameter_update_oracle);
+        self
+    }
+    #[inline(always)]
+    pub fn max_trigger_price_diff_bps(&mut self, max_trigger_price_diff_bps: u64) -> &mut Self {
+        self.instruction.max_trigger_price_diff_bps = Some(max_trigger_price_diff_bps);
+        self
+    }
+    #[inline(always)]
+    pub fn disable_close_position_request(
+        &mut self,
+        disable_close_position_request: bool,
+    ) -> &mut Self {
+        self.instruction.disable_close_position_request = Some(disable_close_position_request);
+        self
+    }
+    #[inline(always)]
+    pub fn max_lp_token_price_change_bps(
+        &mut self,
+        max_lp_token_price_change_bps: u64,
+    ) -> &mut Self {
+        self.instruction.max_lp_token_price_change_bps = Some(max_lp_token_price_change_bps);
+        self
+    }
+    /// Add an additional account to the instruction.
+    #[inline(always)]
+    pub fn add_remaining_account(
+        &mut self,
+        account: &'b solana_program::account_info::AccountInfo<'a>,
+        is_writable: bool,
+        is_signer: bool,
+    ) -> &mut Self {
+        self.instruction
+            .__remaining_accounts
+            .push((account, is_writable, is_signer));
+        self
+    }
+    /// Add additional accounts to the instruction.
+    ///
+    /// Each account is represented by a tuple of the `AccountInfo`, a `bool` indicating whether the account is writable or not,
+    /// and a `bool` indicating whether the account is a signer or not.
+    #[inline(always)]
+    pub fn add_remaining_accounts(
+        &mut self,
+        accounts: &[(
+            &'b solana_program::account_info::AccountInfo<'a>,
+            bool,
+            bool,
+        )],
+    ) -> &mut Self {
+        self.instruction
+            .__remaining_accounts
+            .extend_from_slice(accounts);
+        self
+    }
+    #[inline(always)]
+    pub fn invoke(&self) -> solana_program::entrypoint::ProgramResult {
+        self.invoke_signed(&[])
+    }
+    #[allow(clippy::clone_on_copy)]
+    #[allow(clippy::vec_init_then_push)]
+    pub fn invoke_signed(
+        &self,
+        signers_seeds: &[&[&[u8]]],
+    ) -> solana_program::entrypoint::ProgramResult {
+        let args = SetPoolConfigInstructionArgs {
+            fees: self.instruction.fees.clone().expect("fees is not set"),
+            limit: self.instruction.limit.clone().expect("limit is not set"),
+            max_request_execution_sec: self
+                .instruction
+                .max_request_execution_sec
+                .clone()
+                .expect("max_request_execution_sec is not set"),
+            parameter_update_oracle: self
+                .instruction
+                .parameter_update_oracle
+                .clone()
+                .expect("parameter_update_oracle is not set"),
+            max_trigger_price_diff_bps: self
+                .instruction
+                .max_trigger_price_diff_bps
+                .clone()
+                .expect("max_trigger_price_diff_bps is not set"),
+            disable_close_position_request: self
+                .instruction
+                .disable_close_position_request
+                .clone()
+                .expect("disable_close_position_request is not set"),
+            max_lp_token_price_change_bps: self
+                .instruction
+                .max_lp_token_price_change_bps
+                .clone()
+                .expect("max_lp_token_price_change_bps is not set"),
+        };
         let instruction = SetPoolConfigCpi {
-        __program: self.instruction.__program,
-                  
-          admin: self.instruction.admin.expect("admin is not set"),
-                  
-          perpetuals: self.instruction.perpetuals.expect("perpetuals is not set"),
-                  
-          pool: self.instruction.pool.expect("pool is not set"),
-                          __args: args,
-            };
-    instruction.invoke_signed_with_remaining_accounts(signers_seeds, &self.instruction.__remaining_accounts)
-  }
+            __program: self.instruction.__program,
+
+            admin: self.instruction.admin.expect("admin is not set"),
+
+            perpetuals: self.instruction.perpetuals.expect("perpetuals is not set"),
+
+            pool: self.instruction.pool.expect("pool is not set"),
+            __args: args,
+        };
+        instruction.invoke_signed_with_remaining_accounts(
+            signers_seeds,
+            &self.instruction.__remaining_accounts,
+        )
+    }
 }
 
 #[derive(Clone, Debug)]
 struct SetPoolConfigCpiBuilderInstruction<'a, 'b> {
-  __program: &'b solana_program::account_info::AccountInfo<'a>,
-            admin: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-                perpetuals: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-                pool: Option<&'b solana_program::account_info::AccountInfo<'a>>,
-                        fees: Option<Fees>,
-                limit: Option<Limit>,
-                max_request_execution_sec: Option<i64>,
-        /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
-  __remaining_accounts: Vec<(&'b solana_program::account_info::AccountInfo<'a>, bool, bool)>,
+    __program: &'b solana_program::account_info::AccountInfo<'a>,
+    admin: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    perpetuals: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    pool: Option<&'b solana_program::account_info::AccountInfo<'a>>,
+    fees: Option<Fees>,
+    limit: Option<Limit>,
+    max_request_execution_sec: Option<i64>,
+    parameter_update_oracle: Option<Secp256k1Pubkey>,
+    max_trigger_price_diff_bps: Option<u64>,
+    disable_close_position_request: Option<bool>,
+    max_lp_token_price_change_bps: Option<u64>,
+    /// Additional instruction accounts `(AccountInfo, is_writable, is_signer)`.
+    __remaining_accounts: Vec<(
+        &'b solana_program::account_info::AccountInfo<'a>,
+        bool,
+        bool,
+    )>,
 }
-

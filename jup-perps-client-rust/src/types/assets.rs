@@ -5,19 +5,16 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Asset amounts including owned, locked, and fee reserves
 pub struct Assets {
-pub fees_reserves: u64,
-pub owned: u64,
-pub locked: u64,
-pub guaranteed_usd: u64,
-pub global_short_sizes: u64,
-pub global_short_average_prices: u64,
+    pub fees_reserves: u64,
+    pub owned: u64,
+    pub locked: u64,
+    pub guaranteed_usd: u64,
+    pub global_short_sizes: u64,
+    pub global_short_average_prices: u64,
 }
-
-

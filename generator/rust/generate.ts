@@ -3,7 +3,7 @@
 import { access, copyFile } from 'node:fs/promises'
 import path from 'node:path'
 import { type AnchorIdl, rootNodeFromAnchor } from '@codama/nodes-from-anchor'
-import { renderRustVisitor } from '@codama/renderers'
+import { renderVisitor } from '@codama/renderers-rust'
 import { createFromRoot } from 'codama'
 import anchorIdl from '../idl/jupiter-perpetuals.json'
 import { fixImports } from './fix-imports.ts'
@@ -27,7 +27,7 @@ const createLibFromMod = async () => {
 }
 
 // Constants
-export const OUTPUT_PATH = 'jup-perps-client-rust/src'
+export const OUTPUT_PATH = 'jup-perps-client-rust/src/generated'
 export const LOG_MESSAGES = {
 	START: '🦀 Generating Jupiter Perps Rust client...',
 	PROCESSING: '📄 Processing IDL...',
@@ -40,7 +40,6 @@ const GENERATION_OPTIONS = {
 	deleteFolderBeforeRendering: true,
 	formatCode: true,
 	toolchain: '+stable',
-	crateFolder: 'jup-perps-client-rust',
 	anchorTraits: false,
 	renderParentInstructions: false,
 	dependencyMap: {
@@ -69,12 +68,15 @@ const generateRustClient = async () => {
 		}
 
 		// 3. Configure generation path
-		const pathToGeneratedFolder = path.join(process.cwd(), OUTPUT_PATH)
+		const pathToGeneratedFolder = path.join(
+			process.cwd(),
+			'jup-perps-client-rust',
+		)
 		console.log(`📁 Generation path: ${pathToGeneratedFolder}`)
 
 		// 4. Generate Rust code
 		console.log(LOG_MESSAGES.GENERATING)
-		codama.accept(renderRustVisitor(pathToGeneratedFolder, GENERATION_OPTIONS))
+		codama.accept(renderVisitor(pathToGeneratedFolder, GENERATION_OPTIONS))
 
 		// 5. Fix Solana imports
 		console.log('🔧 Fixing Solana imports...')
@@ -83,6 +85,15 @@ const generateRustClient = async () => {
 		// 6. Create lib.rs from mod.rs for library compatibility
 		console.log('📚 Creating lib.rs from mod.rs...')
 		await createLibFromMod()
+
+		// 7. Format generated code
+		console.log('🔧 Running cargo fmt...')
+		const fmtProc = Bun.spawn(['cargo', 'fmt'], {
+			cwd: path.join(process.cwd(), 'jup-perps-client-rust'),
+			stdio: ['inherit', 'inherit', 'inherit'],
+		})
+		await fmtProc.exited
+		console.log('✅ Formatted with cargo fmt')
 
 		console.log(LOG_MESSAGES.SUCCESS)
 	} catch (error) {

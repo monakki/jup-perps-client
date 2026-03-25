@@ -5,18 +5,16 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
 pub struct PricingParams {
-pub trade_impact_fee_scalar: u64,
-pub buffer: u64,
-pub swap_spread: u64,
-pub max_leverage: u64,
-pub max_global_long_sizes: u64,
-pub max_global_short_sizes: u64,
+    pub trade_impact_fee_scalar: u64,
+    pub buffer: u64,
+    pub swap_spread: u64,
+    pub max_leverage: u64,
+    pub max_global_long_sizes: u64,
+    pub max_global_short_sizes: u64,
 }
-
-

@@ -5,119 +5,140 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use solana_program::pubkey::Pubkey;
-use crate::types::OracleParams;
-use crate::types::PricingParams;
-use crate::types::Permissions;
 use crate::types::Assets;
+use crate::types::BorrowLendParams;
 use crate::types::FundingRateState;
 use crate::types::JumpRateState;
+use crate::types::OracleParams;
+use crate::types::Permissions;
 use crate::types::PriceImpactBuffer;
-use borsh::BorshSerialize;
+use crate::types::PricingParams;
 use borsh::BorshDeserialize;
-
+use borsh::BorshSerialize;
+use solana_program::pubkey::Pubkey;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Token custody account managing assets and oracle pricing in a pool
 pub struct Custody {
-pub discriminator: [u8; 8],
-#[cfg_attr(feature = "serde", serde(with = "serde_with::As::<serde_with::DisplayFromStr>"))]
-pub pool: Pubkey,
-#[cfg_attr(feature = "serde", serde(with = "serde_with::As::<serde_with::DisplayFromStr>"))]
-pub mint: Pubkey,
-#[cfg_attr(feature = "serde", serde(with = "serde_with::As::<serde_with::DisplayFromStr>"))]
-pub token_account: Pubkey,
-pub decimals: u8,
-pub is_stable: bool,
-pub oracle: OracleParams,
-pub pricing: PricingParams,
-pub permissions: Permissions,
-pub target_ratio_bps: u64,
-pub assets: Assets,
-pub funding_rate_state: FundingRateState,
-pub bump: u8,
-pub token_account_bump: u8,
-pub increase_position_bps: u64,
-pub decrease_position_bps: u64,
-pub max_position_size_usd: u64,
-#[cfg_attr(feature = "serde", serde(with = "serde_with::As::<serde_with::DisplayFromStr>"))]
-pub doves_oracle: Pubkey,
-pub jump_rate_state: JumpRateState,
-#[cfg_attr(feature = "serde", serde(with = "serde_with::As::<serde_with::DisplayFromStr>"))]
-pub doves_ag_oracle: Pubkey,
-pub price_impact_buffer: PriceImpactBuffer,
+    pub discriminator: [u8; 8],
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub pool: Pubkey,
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub mint: Pubkey,
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub token_account: Pubkey,
+    pub decimals: u8,
+    pub is_stable: bool,
+    pub oracle: OracleParams,
+    pub pricing: PricingParams,
+    pub permissions: Permissions,
+    pub target_ratio_bps: u64,
+    pub assets: Assets,
+    pub funding_rate_state: FundingRateState,
+    pub bump: u8,
+    pub token_account_bump: u8,
+    pub increase_position_bps: u64,
+    pub decrease_position_bps: u64,
+    pub max_position_size_usd: u64,
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub doves_oracle: Pubkey,
+    pub jump_rate_state: JumpRateState,
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub doves_ag_oracle: Pubkey,
+    pub price_impact_buffer: PriceImpactBuffer,
+    pub borrow_lend_parameters: BorrowLendParams,
+    pub borrows_funding_rate_state: FundingRateState,
+    pub debt: u128,
+    pub borrow_lend_interests_accured: u128,
+    pub borrow_limit_in_token_amount: u64,
+    pub min_interest_fee_bps: u64,
+    pub min_interest_fee_grace_period_seconds: u64,
+    pub total_staked_amount_lamports: u64,
+    pub max_total_staked_amount_lamports: u64,
+    pub external_swap_fee_multiplier_bps: u64,
+    pub disable_close_position_request: bool,
+    pub withdrawal_limit_token_amount: u64,
+    pub withdrawal_token_amount_accumulated: u64,
+    pub withdrawal_limit_last_reset_at: i64,
+    pub withdrawal_limit_interval_seconds: u64,
 }
 
+pub const CUSTODY_DISCRIMINATOR: [u8; 8] = [1, 184, 48, 81, 93, 131, 63, 145];
 
 impl Custody {
-      pub const LEN: usize = 932;
-  
-  
-  
-  #[inline(always)]
-  /// Deserializes account data from raw bytes
-/// 
-/// # Arguments
-/// * `rpc` - Solana RPC client
-/// * `address` - Account address to fetch
-/// 
-/// # Returns
-/// * `Result<T, std::io::Error>` - Decoded account data or error
-pub fn from_bytes(data: &[u8]) -> Result<Self, std::io::Error> {
-    let mut data = data;
-    Self::deserialize(&mut data)
-  }
+    pub const LEN: usize = 1117;
+
+    #[inline(always)]
+    pub fn from_bytes(data: &[u8]) -> Result<Self, std::io::Error> {
+        let mut data = data;
+        Self::deserialize(&mut data)
+    }
 }
 
 impl<'a> TryFrom<&solana_program::account_info::AccountInfo<'a>> for Custody {
-  type Error = std::io::Error;
+    type Error = std::io::Error;
 
-  fn try_from(account_info: &solana_program::account_info::AccountInfo<'a>) -> Result<Self, Self::Error> {
-      let mut data: &[u8] = &(*account_info.data).borrow();
-      Self::deserialize(&mut data)
-  }
+    fn try_from(
+        account_info: &solana_program::account_info::AccountInfo<'a>,
+    ) -> Result<Self, Self::Error> {
+        let mut data: &[u8] = &(*account_info.data).borrow();
+        Self::deserialize(&mut data)
+    }
 }
 
 #[cfg(feature = "fetch")]
-/// Fetches token custody data from a pool
-/// 
-/// # Arguments
-/// * `rpc` - Solana RPC client
-/// * `address` - Account address to fetch
-/// 
-/// # Returns
-/// * `Result<T, std::io::Error>` - Decoded account data or error
 pub fn fetch_custody(
-  rpc: &solana_client::rpc_client::RpcClient,
-  address: &solana_program::pubkey::Pubkey,
+    rpc: &solana_client::rpc_client::RpcClient,
+    address: &solana_program::pubkey::Pubkey,
 ) -> Result<crate::shared::DecodedAccount<Custody>, std::io::Error> {
-  let accounts = fetch_all_custody(rpc, &[*address])?;
-  Ok(accounts[0].clone())
+    let accounts = fetch_all_custody(rpc, &[*address])?;
+    Ok(accounts[0].clone())
 }
 
 #[cfg(feature = "fetch")]
 pub fn fetch_all_custody(
-  rpc: &solana_client::rpc_client::RpcClient,
-  addresses: &[solana_program::pubkey::Pubkey],
+    rpc: &solana_client::rpc_client::RpcClient,
+    addresses: &[solana_program::pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::DecodedAccount<Custody>>, std::io::Error> {
-    let accounts = rpc.get_multiple_accounts(addresses)
-      .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    let accounts = rpc
+        .get_multiple_accounts(addresses)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
     let mut decoded_accounts: Vec<crate::shared::DecodedAccount<Custody>> = Vec::new();
     for i in 0..addresses.len() {
-      let address = addresses[i];
-      let account = accounts[i].as_ref()
-        .ok_or(std::io::Error::new(std::io::ErrorKind::Other, format!("Account not found: {}", address)))?;
-      let data = Custody::from_bytes(&account.data)?;
-      decoded_accounts.push(crate::shared::DecodedAccount { address, account: account.clone(), data });
+        let address = addresses[i];
+        let account = accounts[i].as_ref().ok_or(std::io::Error::new(
+            std::io::ErrorKind::Other,
+            format!("Account not found: {}", address),
+        ))?;
+        let data = Custody::from_bytes(&account.data)?;
+        decoded_accounts.push(crate::shared::DecodedAccount {
+            address,
+            account: account.clone(),
+            data,
+        });
     }
     Ok(decoded_accounts)
 }
 
 #[cfg(feature = "fetch")]
 pub fn fetch_maybe_custody(
-  rpc: &solana_client::rpc_client::RpcClient,
-  address: &solana_program::pubkey::Pubkey,
+    rpc: &solana_client::rpc_client::RpcClient,
+    address: &solana_program::pubkey::Pubkey,
 ) -> Result<crate::shared::MaybeAccount<Custody>, std::io::Error> {
     let accounts = fetch_all_maybe_custody(rpc, &[*address])?;
     Ok(accounts[0].clone())
@@ -125,22 +146,27 @@ pub fn fetch_maybe_custody(
 
 #[cfg(feature = "fetch")]
 pub fn fetch_all_maybe_custody(
-  rpc: &solana_client::rpc_client::RpcClient,
-  addresses: &[solana_program::pubkey::Pubkey],
+    rpc: &solana_client::rpc_client::RpcClient,
+    addresses: &[solana_program::pubkey::Pubkey],
 ) -> Result<Vec<crate::shared::MaybeAccount<Custody>>, std::io::Error> {
-    let accounts = rpc.get_multiple_accounts(addresses)
-      .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
+    let accounts = rpc
+        .get_multiple_accounts(addresses)
+        .map_err(|e| std::io::Error::new(std::io::ErrorKind::Other, e.to_string()))?;
     let mut decoded_accounts: Vec<crate::shared::MaybeAccount<Custody>> = Vec::new();
     for i in 0..addresses.len() {
-      let address = addresses[i];
-      if let Some(account) = accounts[i].as_ref() {
-        let data = Custody::from_bytes(&account.data)?;
-        decoded_accounts.push(crate::shared::MaybeAccount::Exists(crate::shared::DecodedAccount { address, account: account.clone(), data }));
-      } else {
-        decoded_accounts.push(crate::shared::MaybeAccount::NotFound(address));
-      }
+        let address = addresses[i];
+        if let Some(account) = accounts[i].as_ref() {
+            let data = Custody::from_bytes(&account.data)?;
+            decoded_accounts.push(crate::shared::MaybeAccount::Exists(
+                crate::shared::DecodedAccount {
+                    address,
+                    account: account.clone(),
+                    data,
+                },
+            ));
+        } else {
+            decoded_accounts.push(crate::shared::MaybeAccount::NotFound(address));
+        }
     }
-  Ok(decoded_accounts)
+    Ok(decoded_accounts)
 }
-
-

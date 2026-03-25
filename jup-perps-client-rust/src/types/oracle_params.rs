@@ -5,20 +5,20 @@
 //! <https://github.com/codama-idl/codama>
 //!
 
-use solana_program::pubkey::Pubkey;
 use crate::types::OracleType;
-use borsh::BorshSerialize;
 use borsh::BorshDeserialize;
+use borsh::BorshSerialize;
+use solana_program::pubkey::Pubkey;
 
 #[derive(BorshSerialize, BorshDeserialize, Clone, Debug, PartialEq)]
 #[cfg_attr(feature = "serde", derive(serde::Serialize, serde::Deserialize))]
-/// Oracle configuration and pricing parameters
 pub struct OracleParams {
-#[cfg_attr(feature = "serde", serde(with = "serde_with::As::<serde_with::DisplayFromStr>"))]
-pub oracle_account: Pubkey,
-pub oracle_type: OracleType,
-pub max_price_error: u64,
-pub max_price_age_sec: u32,
+    #[cfg_attr(
+        feature = "serde",
+        serde(with = "serde_with::As::<serde_with::DisplayFromStr>")
+    )]
+    pub oracle_account: Pubkey,
+    pub oracle_type: OracleType,
+    pub buffer: u64,
+    pub max_price_age_sec: u32,
 }
-
-

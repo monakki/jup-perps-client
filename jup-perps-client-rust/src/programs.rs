@@ -7,7 +7,5 @@
 
 use solana_program::{pubkey, pubkey::Pubkey};
 
-
-  /// `perpetuals` program ID.
-  pub const PERPETUALS_ID: Pubkey = pubkey!("PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu");
-
+/// `perpetuals` program ID.
+pub const PERPETUALS_ID: Pubkey = pubkey!("PERPHjGBqRHArX4DySjwM6UJHiR3sWAatqfdBS2qQJu");

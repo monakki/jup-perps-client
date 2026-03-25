@@ -7,6 +7,22 @@ For npm package releases, see [js-client/CHANGELOG.md](js-client/CHANGELOG.md).
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.2.0] - 2026-03-25
+
+### Added
+- **BorrowPosition account**: new account type for borrow/lending positions
+- **New instructions from updated IDL**: `borrowFromCustody`, `closeBorrowPosition`, `closePositionRequest2`, `decreasePositionWithTpsl`, `decreasePositionWithTpslAndInternalSwap`, `depositCollateralForBorrows`, `liquidateBorrowPosition`, `repayToCustody`, `withdrawCollateralForBorrows`, `setMaxGlobalSizes`
+- **New types**: `BorrowLendParams`, `Price`, `Secp256k1Pubkey`
+
+### Fixed
+- **Rust generator**: `ProgramResult` import path updated from `solana_program::program_error` to `solana_program::entrypoint` for compatibility with newer `solana-program` versions (fix in `generator/rust/fix-imports.ts`)
+
+### Changed
+- Updated IDL to latest Jupiter Perpetuals version
+- Regenerated both TypeScript and Rust clients from updated IDL
+- Updated Rust example with `BorrowPosition` usage
+- Updated JS README with new account functions and borrow positions section
+
 ## [Unreleased] - 2025-07-19
 
 ### Added - Multi-Language Support

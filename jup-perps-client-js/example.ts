@@ -6,7 +6,12 @@
  */
 
 import { type Address, createSolanaRpc } from '@solana/kit'
-import { fetchCustody, fetchPool, PERPETUALS_PROGRAM_ADDRESS } from './src'
+import {
+	fetchBorrowPosition,
+	fetchCustody,
+	fetchPool,
+	PERPETUALS_PROGRAM_ADDRESS,
+} from './src'
 
 // Program address from IDL
 const JUPITER_PERPS_PROGRAM =
@@ -16,6 +21,9 @@ const JUPITER_PERPS_PROGRAM =
 const KNOWN_ADDRESSES = {
 	// Jupiter Labs Perpetuals Markets
 	jupiterMarkets: '5BUwFW4nRbftYTDMbgxykoFWqWHPzahFSNAaaaJtVKsq' as Address,
+	usdcCustody: 'G18jKKXQwBbrHeiK3C9MRXhkHsLHf7XgCSisykV46EZa' as Address,
+	sampleBorrowPosition:
+		'84hK5omtZ1hGG4BxbbJUHSToapXn6yLbeZFU7bw1AnR5' as Address,
 }
 
 // Example of fetching and parsing Jupiter Perps data
@@ -43,34 +51,61 @@ const runExample = async () => {
 			`   💰 AUM USD: $${(Number(poolData.data.aumUsd) / 1_000_000).toLocaleString()}`,
 		)
 
-		// 3. Fetch custody data for each custody in the pool
-		console.log('\n📋 Custody Details:')
-		for (let i = 0; i < poolData.data.custodies.length; i++) {
-			const custodyAddress = poolData.data.custodies[i]
-			if (!custodyAddress) {
-				console.log(`   ${i + 1}. ⚠️  Empty custody address at index ${i}`)
-				continue
-			}
-			try {
-				const custodyData = await fetchCustody(rpc, custodyAddress)
-				console.log(`   ${i + 1}. Address: ${custodyAddress}`)
-				console.log(`      🪙 Token Mint: ${custodyData.data.mint}`)
-				console.log(
-					`      💰 Assets Owned: ${custodyData.data.assets.owned.toString()}`,
-				)
-				console.log(
-					`      🔒 Assets Locked: ${custodyData.data.assets.locked.toString()}`,
-				)
-				console.log(`      📊 Decimals: ${custodyData.data.decimals}`)
-				console.log(
-					`      🎯 Target Ratio: ${custodyData.data.targetRatioBps} bps`,
-				)
-				console.log('')
-			} catch (custodyError) {
-				console.log(`   ${i + 1}. Address: ${custodyAddress}`)
-				console.log(`      ⚠️  Failed to fetch custody data: ${custodyError}`)
-				console.log('')
-			}
+		// 3. Borrow/Lending data from USDC Custody (new fields in v1.2.0)
+		console.log(
+			'\n🏦 Borrow/Lending Data - USDC Custody (new fields in v1.2.0):',
+		)
+		try {
+			const custodyData = await fetchCustody(rpc, KNOWN_ADDRESSES.usdcCustody)
+			const c = custodyData.data
+			console.log(`   📍 Custody: ${KNOWN_ADDRESSES.usdcCustody}`)
+			console.log(`   🪙 Mint: ${c.mint}`)
+			console.log(`   💸 Total Debt: ${c.debt.toString()}`)
+			console.log(
+				`   📈 Borrow Interests Accrued: ${c.borrowLendInterestsAccured.toString()}`,
+			)
+			console.log(
+				`   🔒 Borrow Limit (tokens): ${c.borrowLimitInTokenAmount.toString()}`,
+			)
+			console.log(
+				`   📊 Borrows Limit: ${c.borrowLendParameters.borrowsLimitInBps} bps`,
+			)
+			console.log(
+				`   🛡️  Maintenance Margin: ${c.borrowLendParameters.maintainanceMarginBps} bps`,
+			)
+			console.log(`   💰 Min Interest Fee: ${c.minInterestFeeBps} bps`)
+			console.log(
+				`   📅 Borrows Rate Last Update: ${new Date(Number(c.borrowsFundingRateState.lastUpdate) * 1000).toISOString()}`,
+			)
+			console.log(
+				`   📈 Borrows Cumulative Rate: ${c.borrowsFundingRateState.cumulativeInterestRate.toString()}`,
+			)
+		} catch (e) {
+			console.log(`   ⚠️  Failed: ${e instanceof Error ? e.message : e}`)
+		}
+
+		// 4. BorrowPosition account (new in v1.2.0)
+		console.log('\n📄 BorrowPosition Account (new in v1.2.0):')
+		try {
+			const bp = await fetchBorrowPosition(
+				rpc,
+				KNOWN_ADDRESSES.sampleBorrowPosition,
+			)
+			console.log(`   📍 Address: ${KNOWN_ADDRESSES.sampleBorrowPosition}`)
+			console.log(`   👤 Owner: ${bp.data.owner}`)
+			console.log(`   🏦 Custody: ${bp.data.custody}`)
+			console.log(`   💸 Borrow Size: ${bp.data.borrowSize.toString()}`)
+			console.log(
+				`   🔒 Locked Collateral: ${bp.data.lockedCollateral.toString()}`,
+			)
+			console.log(
+				`   🕐 Open Time: ${new Date(Number(bp.data.openTime) * 1000).toISOString()}`,
+			)
+			console.log(
+				`   🔄 Last Borrowed: ${new Date(Number(bp.data.lastBorrowed) * 1000).toISOString()}`,
+			)
+		} catch (e) {
+			console.log(`   ⚠️  Failed: ${e instanceof Error ? e.message : e}`)
 		}
 	} catch (error) {
 		console.log(
